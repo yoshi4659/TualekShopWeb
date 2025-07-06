@@ -54,7 +54,13 @@ def buy():
         ]
         sheet.append_row(data)
         return redirect("/menu")
-    return render_template("buy.html")
+       
+    # GET = แสดงฟอร์มพร้อม datalist
+    records = sheet.get_all_values()
+    brands = sorted(set(row[2] for row in records if row[2]))
+    models = sorted(set(row[3] for row in records if row[3]))
+    storages = sorted(set(row[4] for row in records if row[4]))
+    return render_template("buy.html", brands=brands, models=models, storages=storages)
 
 # ---------------- SELL ----------------
 @app.route("/sell", methods=["GET", "POST"])

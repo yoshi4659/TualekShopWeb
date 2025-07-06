@@ -12,20 +12,52 @@
       font-family: 'Prompt', sans-serif;
       padding: 1rem;
     }
+    datalist option {
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h3 class="text-center mb-4">📥 ซื้อเครื่องเข้าร้าน</h3>
     <form method="POST" class="bg-white p-4 rounded shadow-sm">
-      <div class="mb-3"><input class="form-control form-control-lg" name="imei" placeholder="IMEI" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="brand" placeholder="ยี่ห้อ" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="model" placeholder="รุ่น" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="storage" placeholder="ความจุ (GB)" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="condition" placeholder="สภาพเครื่อง" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="defect" placeholder="ตำหนิ"></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="buy_price" placeholder="ราคาซื้อ (บาท)" required></div>
-      <div class="mb-3"><input class="form-control form-control-lg" name="seller" placeholder="ชื่อผู้ขาย" required></div>
+      <div class="mb-3"><input name="imei" class="form-control form-control-lg" placeholder="IMEI" required></div>
+
+      <div class="mb-3">
+        <input name="brand" list="brandlist" class="form-control form-control-lg" placeholder="ยี่ห้อ" required>
+        <datalist id="brandlist">
+          {% for b in brands %}<option value="{{ b }}">{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="mb-3">
+        <input name="model" list="modellist" class="form-control form-control-lg" placeholder="รุ่น" required>
+        <datalist id="modellist">
+          {% for m in models %}<option value="{{ m }}">{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="mb-3">
+        <input name="storage" list="storagelist" class="form-control form-control-lg" placeholder="ความจุ (GB)" required>
+        <datalist id="storagelist">
+          {% for s in storages %}<option value="{{ s }}">{% endfor %}
+        </datalist>
+      </div>
+
+      <div class="mb-3">
+        <select name="condition" class="form-select form-select-lg" required>
+          <option value="">เลือกสภาพเครื่อง</option>
+          <option value="80-90%">80-90%</option>
+          <option value="70-80%">70-80%</option>
+          <option value="60-70%">60-70%</option>
+          <option value="ต่ำกว่า 50%">ต่ำกว่า 50%</option>
+        </select>
+      </div>
+
+      <div class="mb-3"><input name="defect" class="form-control form-control-lg" placeholder="ตำหนิ"></div>
+      <div class="mb-3"><input name="buy_price" class="form-control form-control-lg" placeholder="ราคาซื้อ (บาท)" required></div>
+      <div class="mb-3"><input name="seller" class="form-control form-control-lg" placeholder="ชื่อผู้ขาย" required></div>
+
       <button class="btn btn-success btn-lg w-100" type="submit">💾 บันทึกข้อมูล</button>
     </form>
     <div class="text-center mt-3"><a href="/menu" class="btn btn-secondary">← กลับเมนู</a></div>
