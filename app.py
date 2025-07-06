@@ -78,7 +78,6 @@ def sell():
             return render_template("sell.html", found=found)
         elif "confirm" in request.form:
             index = int(request.form["index"])
-            
             sheet.update_cell(index, 10, request.form["sell_price"])   # ราคาขาย
             sheet.update_cell(index, 11, request.form["buyer"])        # ผู้ซื้อ
             sheet.update_cell(index, 12, request.form["profit"])       # กำไร
@@ -90,52 +89,12 @@ def sell():
     return render_template("sell.html", found=found)
  
 # ---------------- DASHBOARD (admin01 only) ----------------
-@app.route("/dashboard", methods=["GET", "POST"])
+@app.route("/dashboard")
 def dashboard():
     if session.get("user") != "admin01":
         return redirect("/")
-
-    data = sheet.get_all_values()
-    headers = data[0]
-    all_rows = data[1:]
-
-    # กรองข้อมูล
-    filtered = []
-    branch = request.form.get("branch", "")
-    start = request.form.get("start_date", "")
-    end = request.form.get("end_date", "")
-
-    for row in all_rows:
-        sold_date = row[14]  # วันที่ขาย
-        branch_code = row[16]  # ผู้บันทึก
-
-        if not row[10]:  # ยังไม่ได้ขาย
-            continue
-
-        if branch and branch != branch_code:
-            continue
-
-        if start and sold_date < start:
-            continue
-        if end and sold_date > end:
-            continue
-
-        filtered.append(row)
-
-    # สรุปยอดรวม
-    total_sale = sum(float(r[10]) if r[10] else 0 for r in filtered)
-    total_profit = sum(float(r[12]) if r[12] else 0 for r in filtered)
-
-    return render_template("dashboard.html",
-        headers=headers,
-        rows=filtered,
-        summary={
-            "total_sale": total_sale,
-            "total_profit": total_profit,
-            "count": len(filtered)
-        }
-    )
-
+    records = sheet.get_all_values()
+    return render_template("dashboard.html", rows=records)
 
 # ---------------- LOGOUT ----------------
 @app.route("/logout")
