@@ -1,33 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
+  <meta charset="UTF-8">
   <title>ขายเครื่องออก</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Prompt&display=swap" rel="stylesheet">
 </head>
-<body>
-  <h2>ขายเครื่องออก</h2>
-  <form method="POST">
-    <p>ค้นหา IMEI: <input name="search" required>
-    <button type="submit">ค้นหา</button></p>
-  </form>
+<body class="bg-light" style="font-family: 'Prompt', sans-serif;">
+  <div class="container py-3">
+    <h3 class="text-center mb-4">📤 ขายเครื่องออก</h3>
 
-  {% if found %}
-    <h3>รายการที่พบ</h3>
-    {% for index, row in found %}
-      <form method="POST">
-        <input type="hidden" name="index" value="{{ index }}">
-        <p><b>IMEI:</b> {{ row[1] }} / {{ row[2] }} {{ row[3] }} / {{ row[4] }}</p>
-        <p>ราคาขาย: <input name="sell_price" required></p>
-        <p>ผู้ซื้อ: <input name="buyer" required></p>
-        <p>กำไร: <input name="profit"></p>
-        <p>ค่าคอม: <input name="commission"></p>
-        <p>หมายเหตุ: <input name="note"></p>
-        <button type="submit" name="confirm">บันทึกการขาย</button>
-      </form>
-      <hr>
-    {% endfor %}
-  {% endif %}
+    <form method="POST" class="mb-4">
+      <div class="input-group">
+        <input name="search" class="form-control form-control-lg" placeholder="ค้นหา IMEI" required>
+        <button class="btn btn-primary btn-lg" type="submit">ค้นหา</button>
+      </div>
+    </form>
 
-  <br>
-  <a href="/menu">← กลับเมนู</a>
+    {% if found %}
+      <div class="alert alert-info text-center">พบ {{ found | length }} รายการ</div>
+      {% for index, row in found %}
+        <form method="POST" class="bg-white p-3 rounded shadow-sm mb-3">
+          <input type="hidden" name="index" value="{{ index }}">
+          <p><strong>{{ row[2] }} {{ row[3] }} {{ row[4] }}</strong><br>IMEI: {{ row[1] }}</p>
+          <input name="sell_price" class="form-control mb-2" placeholder="ราคาขาย" required>
+          <input name="buyer" class="form-control mb-2" placeholder="ชื่อผู้ซื้อ" required>
+          <input name="profit" class="form-control mb-2" placeholder="กำไร">
+          <input name="commission" class="form-control mb-2" placeholder="ค่าคอม">
+          <input name="note" class="form-control mb-2" placeholder="หมายเหตุ">
+          <button type="submit" name="confirm" class="btn btn-success w-100">✅ บันทึกการขาย</button>
+        </form>
+      {% endfor %}
+    {% endif %}
+
+    <div class="text-center"><a href="/menu" class="btn btn-secondary">← กลับเมนู</a></div>
+  </div>
 </body>
 </html>
