@@ -1,6 +1,4 @@
-#from flask import Flask, render_template, request, redirect, session
-from flask import Flask, render_template, request, redirect, session, jsonify
-
+from flask import Flask, render_template, request, redirect, session
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from datetime import datetime
@@ -89,24 +87,6 @@ def sell():
             return redirect("/menu")
     return render_template("sell.html", found=found)
  
-
-@app.route("/api/search_imei", methods=["POST"])
-def search_imei():
-    partial = request.json.get("partial_imei")
-    matches = []
-    if partial and len(partial) == 4:
-        records = sheet.get_all_values()
-        for i, row in enumerate(records):
-            if row[1][-4:] == partial and not row[10]:  # ยังไม่ขาย
-                matches.append({
-                    "index": i + 1,
-                    "imei": row[1],
-                    "brand": row[2],
-                    "model": row[3],
-                    "storage": row[4]
-                })
-    return jsonify(matches)
-
 # ---------------- DASHBOARD (admin01 only) ----------------
 @app.route("/dashboard")
 def dashboard():
