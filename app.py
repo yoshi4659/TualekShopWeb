@@ -69,21 +69,19 @@ def sell():
         return redirect("/")
     found = []
     if request.method == "POST":
-        if "search" in request.form:
-            imei = request.form["search"]
-            records = sheet.get_all_values()
-            for i, row in enumerate(records):
-                if imei in row[1]:
-                    found.append((i + 1, row))  # (row number, data)
-            return render_template("sell.html", found=found)
-        elif "confirm" in request.form:
+        if "confirm" in request.form:
             index = int(request.form["index"])
+            row = sheet.row_values(index)
+            buy_price = float(row[7]) if row[7] else 0  # ราคาซื้อจากแถวเดิม
+            sell_price = float(request.form["sell_price"])
+            profit = sell_price - buy_price
+
             sheet.update_cell(index, 10, request.form["sell_price"])   # ราคาขาย
             sheet.update_cell(index, 11, request.form["buyer"])        # ผู้ซื้อ
-            sheet.update_cell(index, 12, request.form["profit"])       # กำไร
+            sheet.update_cell(index, 12, profit)                       # ✅ กำไร (auto)
             sheet.update_cell(index, 13, request.form["commission"])   # ค่าคอม
-            sheet.update_cell(index, 14, datetime.now().strftime("%Y-%m-%d"))  # วันที่ขาย
-            sheet.update_cell(index, 15, request.form["note"])         # หมายเหตุ
+            sheet.update_cell(index, 14, datetime.now().strftime("%Y-%m-%d"))
+            sheet.update_cell(index, 15, request.form["note"])
             return redirect("/menu")
     return render_template("sell.html", found=found)
  
