@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>เข้าสู่ระบบ</title></head>
+<body>
+  <h2>เข้าสู่ระบบ TualekShop</h2>
+  {% if error %}<p style="color:red">{{ error }}</p>{% endif %}
+  <form method="POST">
+    <input name="code" placeholder="รหัสสาขา / admin">
+    <button type="submit">เข้าสู่ระบบ</button>
+  </form>
+</body>
+</html>

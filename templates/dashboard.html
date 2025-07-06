@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>แดชบอร์ด - Admin</title>
+</head>
+<body>
+  <h2>แดชบอร์ดข้อมูลทั้งหมด</h2>
+  <table border="1" cellpadding="5">
+    <tr>
+      {% for head in rows[0] %}
+        <th>{{ head }}</th>
+      {% endfor %}
+    </tr>
+    {% for row in rows[1:] %}
+      <tr>
+        {% for item in row %}
+          <td>{{ item }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+
+  <br>
+  <a href="/menu">← กลับเมนู</a>
+</body>
+</html>

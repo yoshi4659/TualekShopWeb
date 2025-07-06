@@ -1,60 +1,44 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session
 import gspread
-from datetime import datetime
 from oauth2client.service_account import ServiceAccountCredentials
+from datetime import datetime
 
 app = Flask(__name__)
-app.secret_key = "tualekshop_secret"
+app.secret_key = 'tualekshop-secret'
 
-# เชื่อม Google Sheet
+# Setup Google Sheet
+SHEET_NAME = 'TualekPhoneDB'
+SHEET_TAB = 'Sheet1'
+
 scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
 creds = ServiceAccountCredentials.from_json_keyfile_name("service_account.json", scope)
 client = gspread.authorize(creds)
-sheet = client.open("TualekPhoneDB").worksheet("Sheet1")
+sheet = client.open(SHEET_NAME).worksheet(SHEET_TAB)
 
-# ---------------- Login ----------------
-users = {
-    "0001": "branch1",
-    "0002": "branch2",
-    "admin01": "admin"
-}
-
+# ---------------- LOGIN ----------------
 @app.route("/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        user = request.form["username"]
-        if user in users:
-            session["user"] = user
-            session["role"] = users[user]
+        code = request.form["code"]
+        if code in ["0001", "0002", "admin01"]:
+            session["user"] = code
             return redirect("/menu")
         else:
-            return "รหัสไม่ถูกต้อง"
+            return render_template("login.html", error="รหัสไม่ถูกต้อง")
     return render_template("login.html")
 
-@app.route("/logout")
-def logout():
-    session.clear()
-    return redirect("/")
-
-# ---------------- Menu ----------------
+# ---------------- MENU ----------------
 @app.route("/menu")
 def menu():
     if "user" not in session:
         return redirect("/")
-    return render_template("menu.html", role=session["role"])
+    return render_template("menu.html", user=session["user"])
 
-# ---------------- ซื้อเข้า ----------------
+# ---------------- BUY ----------------
 @app.route("/buy", methods=["GET", "POST"])
 def buy():
     if "user" not in session:
         return redirect("/")
-    
-    # ดึงรายการที่เคยซื้อเข้าแล้วมาแสดงใน dropdown
-    records = sheet.get_all_records()
-    brands = list(set([r["ยี่ห้อ"] for r in records if r["ยี่ห้อ"]]))
-    models = list(set([r["รุ่น"] for r in records if r["รุ่น"]]))
-    storages = list(set([r["ความจุ"] for r in records if r["ความจุ"]]))
-
     if request.method == "POST":
         data = [
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -66,61 +50,50 @@ def buy():
             request.form["defect"],
             request.form["buy_price"],
             request.form["seller"],
-            "", "", "", "", "", "", session["user"]  # ช่องว่างสำหรับข้อมูลขาย
+            "", "", "", "", "", "", session["user"]
         ]
         sheet.append_row(data)
         return redirect("/menu")
+    return render_template("buy.html")
 
-    return render_template("buy.html", brands=brands, models=models, storages=storages)
-
-# ---------------- ขายออก ----------------
+# ---------------- SELL ----------------
 @app.route("/sell", methods=["GET", "POST"])
 def sell():
     if "user" not in session:
         return redirect("/")
-
-    records = sheet.get_all_records()
-    imeis = [r["IMEI"] for r in records if r["ราคาขาย"] == ""]
-    buyers = list(set([r["ผู้ซื้อ"] for r in records if r["ผู้ซื้อ"]]))
-
+    found = []
     if request.method == "POST":
-        search_imei = request.form["imei"]
-        found = None
-        for i, r in enumerate(records):
-            if search_imei in r["IMEI"] and r["ราคาขาย"] == "":
-                found = (i + 2)  # บรรทัดจริงใน Google Sheet
-                break
-        if found:
-            sheet.update_cell(found, 10, request.form["sell_price"])  # ราคาขาย
-            sheet.update_cell(found, 11, request.form["buyer"])      # ผู้ซื้อ
-            sheet.update_cell(found, 12, request.form["profit"])     # กำไร
-            sheet.update_cell(found, 13, request.form["commission"]) # ค่าคอม
-            sheet.update_cell(found, 14, request.form["sell_date"])  # วันที่ขาย
-            sheet.update_cell(found, 15, request.form["note"])       # หมายเหตุ
-            sheet.update_cell(found, 16, session["user"])            # ผู้บันทึก (สาขา)
+        if "search" in request.form:
+            imei = request.form["search"]
+            records = sheet.get_all_values()
+            for i, row in enumerate(records):
+                if imei in row[1]:
+                    found.append((i + 1, row))  # (row number, data)
+            return render_template("sell.html", found=found)
+        elif "confirm" in request.form:
+            index = int(request.form["index"])
+            sheet.update_cell(index, 10, request.form["sell_price"])   # ราคาขาย
+            sheet.update_cell(index, 11, request.form["buyer"])        # ผู้ซื้อ
+            sheet.update_cell(index, 12, request.form["profit"])       # กำไร
+            sheet.update_cell(index, 13, request.form["commission"])   # ค่าคอม
+            sheet.update_cell(index, 14, datetime.now().strftime("%Y-%m-%d"))  # วันที่ขาย
+            sheet.update_cell(index, 15, request.form["note"])         # หมายเหตุ
             return redirect("/menu")
+    return render_template("sell.html", found=found)
 
-    return render_template("sell.html", imeis=imeis, buyers=buyers)
-
-# ---------------- Dashboard ----------------
+# ---------------- DASHBOARD (admin01 only) ----------------
 @app.route("/dashboard")
 def dashboard():
-    if session.get("role") != "admin":
-        return "เฉพาะเจ้าของร้านเท่านั้น"
+    if session.get("user") != "admin01":
+        return redirect("/")
+    records = sheet.get_all_values()
+    return render_template("dashboard.html", rows=records)
 
-    records = sheet.get_all_records()
-    branch = request.args.get("branch")
-    date = request.args.get("date")  # optional filter
-
-    if branch:
-        records = [r for r in records if r["ผู้บันทึก"] == branch]
-    if date:
-        records = [r for r in records if r["วันที่ขาย"] == date]
-
-    total_sell = sum([float(r["ราคาขาย"]) if r["ราคาขาย"] else 0 for r in records])
-    total_profit = sum([float(r["กำไร"]) if r["กำไร"] else 0 for r in records])
-
-    return render_template("dashboard.html", records=records, total_sell=total_sell, total_profit=total_profit)
+# ---------------- LOGOUT ----------------
+@app.route("/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()

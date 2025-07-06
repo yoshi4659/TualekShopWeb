@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head><title>เมนูหลัก</title></head>
+<body>
+  <h2>สวัสดี {{ user }}</h2>
+  <ul>
+    <li><a href="/buy">ซื้อเครื่องเข้าร้าน</a></li>
+    <li><a href="/sell">ขายเครื่องออก</a></li>
+    {% if user == 'admin01' %}
+    <li><a href="/dashboard">ดูแดชบอร์ด</a></li>
+    {% endif %}
+    <li><a href="/logout">ออกจากระบบ</a></li>
+  </ul>
+</body>
+</html>

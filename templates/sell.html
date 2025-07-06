@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ขายเครื่องออก</title>
+</head>
+<body>
+  <h2>ขายเครื่องออก</h2>
+  <form method="POST">
+    <p>ค้นหา IMEI: <input name="search" required>
+    <button type="submit">ค้นหา</button></p>
+  </form>
+
+  {% if found %}
+    <h3>รายการที่พบ</h3>
+    {% for index, row in found %}
+      <form method="POST">
+        <input type="hidden" name="index" value="{{ index }}">
+        <p><b>IMEI:</b> {{ row[1] }} / {{ row[2] }} {{ row[3] }} / {{ row[4] }}</p>
+        <p>ราคาขาย: <input name="sell_price" required></p>
+        <p>ผู้ซื้อ: <input name="buyer" required></p>
+        <p>กำไร: <input name="profit"></p>
+        <p>ค่าคอม: <input name="commission"></p>
+        <p>หมายเหตุ: <input name="note"></p>
+        <button type="submit" name="confirm">บันทึกการขาย</button>
+      </form>
+      <hr>
+    {% endfor %}
+  {% endif %}
+
+  <br>
+  <a href="/menu">← กลับเมนู</a>
+</body>
+</html>

@@ -1,6 +1,7 @@
 services:
   - type: web
-    name: tualekshop
+    name: tualekshopweb
     env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python app.py"
+    autoDeploy: true
