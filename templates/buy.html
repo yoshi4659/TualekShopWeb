@@ -21,7 +21,7 @@
   <div class="container">
     <h3 class="text-center mb-4">📥 ซื้อเครื่องเข้าร้าน</h3>
     <form method="POST" class="bg-white p-4 rounded shadow-sm">
-      <div class="mb-3"><input name="imei" class="form-control form-control-lg" placeholder="IMEI" required></div>
+     
 
       <div class="mb-3">
         <input name="brand" list="brandlist" class="form-control form-control-lg" placeholder="ยี่ห้อ" required>
@@ -44,9 +44,11 @@
         </datalist>
       </div>
 
+       <div class="mb-3"><input name="imei" class="form-control form-control-lg" placeholder="IMEI" required></div>
+
       <div class="mb-3">
         <select name="condition" class="form-select form-select-lg" required>
-          <option value="">เลือกสภาพเครื่อง</option>
+          <option value="">สุขภาพแบตเตอรี่</option>
           <option value="80-90%">80-90%</option>
           <option value="70-80%">70-80%</option>
           <option value="60-70%">60-70%</option>
