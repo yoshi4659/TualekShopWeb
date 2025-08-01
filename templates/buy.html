@@ -46,15 +46,10 @@
 
        <div class="mb-3"><input name="imei" class="form-control form-control-lg" placeholder="IMEI" required></div>
 
-      <div class="mb-3">
-        <select name="condition" class="form-select form-select-lg" required>
-          <option value="">สุขภาพแบตเตอรี่</option>
-          <option value="80-90%">80-90%</option>
-          <option value="70-80%">70-80%</option>
-          <option value="60-70%">60-70%</option>
-          <option value="ต่ำกว่า 50%">ต่ำกว่า 50%</option>
-        </select>
-      </div>
+     <div class="mb-3">
+    <input type="text" name="condition" class="form-control form-control-lg" 
+           placeholder="กรอกสุขภาพแบตเตอรี่ (%)" required>
+</div>
 
       <div class="mb-3"><input name="defect" class="form-control form-control-lg" placeholder="ตำหนิ"></div>
       <div class="mb-3"><input name="buy_price" class="form-control form-control-lg" placeholder="ราคาซื้อ (บาท)" required></div>
